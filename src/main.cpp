@@ -224,6 +224,10 @@ int main() {
         lightShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightShader.setVec3("lightPos", lightPos);
         lightShader.setVec3("viewPos", cameraPos);
+        lightShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
+        lightShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
+        lightShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
+        lightShader.setFloat("material.shininess", 32.0f);
 
         //light 
         glm::mat4 modelCube = glm::mat4(1.0f);
