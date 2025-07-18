@@ -224,10 +224,10 @@ int main() {
         lightShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
         lightShader.setVec3("lightPos", lightPos);
         lightShader.setVec3("viewPos", cameraPos);
-        lightShader.setVec3("material.ambient", 1.0f, 0.5f, 0.31f);
-        lightShader.setVec3("material.diffuse", 1.0f, 0.5f, 0.31f);
-        lightShader.setVec3("material.specular", 0.5f, 0.5f, 0.5f);
-        lightShader.setFloat("material.shininess", 32.0f);
+        lightShader.setVec3("material.ambient", 0.2125f, 0.1275f, 0.054f);
+        lightShader.setVec3("material.diffuse", 0.714f, 0.4284f, 0.18144f);
+        lightShader.setVec3("material.specular", 0.393548f, 0.271906f, 0.166721f);
+        lightShader.setFloat("material.shininess", 25.6f);
         lightShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         lightShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darkened
         lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
@@ -237,6 +237,20 @@ int main() {
         modelCube = glm::mat4(1.0f);
         modelCube =glm::translate(modelCube, lightPos);
         modelCube = glm::scale(modelCube, glm::vec3(0.2f));
+
+        //light properties
+        glm::vec3 lightColor;
+        lightColor.x = sin(glfwGetTime() * 2.0f);
+        lightColor.y = sin(glfwGetTime() * 0.7f);
+        lightColor.z = sin(glfwGetTime() * 1.3f);
+
+        glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
+        glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
+
+        lightShader.setVec3("light.ambient", ambientColor);
+        lightShader.setVec3("light.diffuse", diffuseColor);
+
+        lightSourceShader.setVec3("lightColor", lightColor);
 
         glm::mat4 trans = glm::mat4(1.0f);
         trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
