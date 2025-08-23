@@ -292,13 +292,17 @@ int main() {
         lightShader.setVec3("material.diffuse", 0.714f, 0.4284f, 0.18144f);
         lightShader.setVec3("material.specular", 0.393548f, 0.271906f, 0.166721f);
         lightShader.setFloat("material.shininess", 25.6f);
-        lightShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
-        lightShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darkened
+        lightShader.setVec3("light.ambient", 0.3f, 0.3f, 0.3f);
+        lightShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f); // darkened
         lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
         lightShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         lightShader.setFloat("light.constant", 1.0f);
-        lightShader.setFloat("light.linear", 0.09f);
-        lightShader.setFloat("light.quadratic", 0.032f);
+        lightShader.setFloat("light.linear", 0.05f);
+        lightShader.setFloat("light.quadratic", 0.012f);
+        lightShader.setVec3("light.position", cameraPos);
+        lightShader.setVec3("light.direction", cameraFront);
+        lightShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
+        lightShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5)));
 
         //light 
         glm::mat4 modelCube = glm::mat4(1.0f);
