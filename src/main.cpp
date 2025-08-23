@@ -160,6 +160,19 @@ int main() {
         -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,  0.0f,  1.0f
     };
 
+            glm::vec3 cubePositions[] = {
+            glm::vec3( 0.0f, 0.0f, 0.0f),
+            glm::vec3( 2.0f, 5.0f,-15.0f),
+            glm::vec3(-1.5f,-2.2f,-2.5f),
+            glm::vec3(-3.8f,-2.0f,-12.3f),
+            glm::vec3( 2.4f,-0.4f,-3.5f),
+            glm::vec3(-1.7f, 3.0f,-7.5f),
+            glm::vec3( 1.3f,-2.0f,-2.5f),
+            glm::vec3( 1.5f, 2.0f,-2.5f),
+            glm::vec3( 1.5f, 0.2f,-1.5f),
+            glm::vec3(-1.3f, 1.0f,-1.5f)
+            };
+
     //Camera
     glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
     glm::mat4 trans = glm::mat4(1.0f);
@@ -207,6 +220,12 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER,sizeof(vertices),vertices,GL_STATIC_DRAW);
     glVertexAttribPointer(0, 3, GL_FLOAT,GL_FALSE, 8 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+        //normals
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+    //texture
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     //set the texture wrapping/filtering options
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -276,6 +295,10 @@ int main() {
         lightShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
         lightShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f); // darkened
         lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
+        lightShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+        lightShader.setFloat("light.constant", 1.0f);
+        lightShader.setFloat("light.linear", 0.09f);
+        lightShader.setFloat("light.quadratic", 0.032f);
 
         //light 
         glm::mat4 modelCube = glm::mat4(1.0f);
@@ -284,10 +307,7 @@ int main() {
         modelCube = glm::scale(modelCube, glm::vec3(0.2f));
 
         //light properties
-        glm::vec3 lightColor;
-        lightColor.x = 2.0f;
-        lightColor.y =  0.7f;
-        lightColor.z =  1.3f;
+        glm::vec3 lightColor = glm::vec3(1.0f);
 
         glm::vec3 diffuseColor = lightColor * glm::vec3(0.5f);
         glm::vec3 ambientColor = diffuseColor * glm::vec3(0.2f);
@@ -323,8 +343,15 @@ int main() {
         unsigned int projectionLoc = glGetUniformLocation(lightShader.ID, "projection");
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
-        glBindVertexArray(lightVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for(unsigned int i = 0; i < 10; i++) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, cubePositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            lightShader.setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         lightSourceShader.use();
         unsigned int modelLoc = glGetUniformLocation(lightSourceShader.ID, "model");
