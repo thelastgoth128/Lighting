@@ -15,7 +15,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0,0,width,height);
 }
 
-glm::vec3 cameraPos =glm::vec3(0.0f, 0.0f, 8.0f);
+glm::vec3 cameraPos =glm::vec3(0.0f, 0.0f, 5.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
 glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
 
@@ -173,6 +173,13 @@ int main() {
             glm::vec3(-1.3f, 1.0f,-1.5f)
             };
 
+    glm::vec3 pointLightPositions[] = {
+        glm::vec3( 0.7f, 0.2f, 2.0f),
+        glm::vec3( 2.3f,-3.3f,-4.0f),
+        glm::vec3(-4.0f, 2.0f,-12.0f),
+        glm::vec3( 0.0f, 0.0f,-3.0f)
+    };
+
     //Camera
     glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
     glm::mat4 trans = glm::mat4(1.0f);
@@ -238,7 +245,7 @@ int main() {
 
     int width, height, nrChannels, width2, height2, nrChannels2;
     unsigned char * data = stbi_load("C:\\Users\\HP\\OneDrive\\Documentos\\Cyrus\\Projects\\OpenGL\\src\\Textures\\container2.png", &width, &height, &nrChannels, 0);
-    unsigned char * data2 = stbi_load("C:\\Users\\HP\\OneDrive\\Documentos\\Cyrus\\Projects\\OpenGL\\src\\Textures\\container2_specular.png", &width2, &height2, &nrChannels2, 0);
+    //unsigned char * data2 = stbi_load("C:\\Users\\HP\\OneDrive\\Documentos\\Cyrus\\Projects\\OpenGL\\src\\Textures\\container2_specular.png", &width2, &height2, &nrChannels2, 0);
     
     if (data) {
         //generate the texture1
@@ -250,19 +257,19 @@ int main() {
         cout << "Failed to load texture1" << endl;
     }
 
-    if (data2) {
-        //generate texture2
-        glBindTexture(GL_TEXTURE_2D, texture2);
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width2, height2, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else {
-        cout << "Failed to load texture2" << endl;
-    }
+    // if (data2) {
+    //     //generate texture2
+    //     glBindTexture(GL_TEXTURE_2D, texture2);
+    //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width2, height2, 0, GL_RGB, GL_UNSIGNED_BYTE, data2);
+    //     glGenerateMipmap(GL_TEXTURE_2D);
+    // }
+    // else {
+    //     cout << "Failed to load texture2" << endl;
+    // }
 
     //free the image memory
     stbi_image_free(data);
-    stbi_image_free(data2);
+    //stbi_image_free(data2);
 
     Shader lightShader("C:\\Users\\HP\\OneDrive\\Documentos\\Cyrus\\Projects\\OpenGL\\src\\shaders\\vertex.vs","C:\\Users\\HP\\OneDrive\\Documentos\\Cyrus\\Projects\\OpenGL\\src\\shaders\\fragment.fss");
     Shader lightSourceShader("C:\\Users\\HP\\OneDrive\\Documentos\\Cyrus\\Projects\\OpenGL\\src\\shaders\\cubevertex.vs","C:\\Users\\HP\\OneDrive\\Documentos\\Cyrus\\Projects\\OpenGL\\src\\shaders\\cubefragment.fss");
@@ -295,7 +302,7 @@ int main() {
         lightShader.setVec3("light.ambient", 0.3f, 0.3f, 0.3f);
         lightShader.setVec3("light.diffuse", 0.8f, 0.8f, 0.8f); // darkened
         lightShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
-        lightShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+        // lightShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
         lightShader.setFloat("light.constant", 1.0f);
         lightShader.setFloat("light.linear", 0.05f);
         lightShader.setFloat("light.quadratic", 0.012f);
@@ -303,6 +310,12 @@ int main() {
         lightShader.setVec3("light.direction", cameraFront);
         lightShader.setFloat("light.cutOff", glm::cos(glm::radians(12.5f)));
         lightShader.setFloat("light.outerCutOff", glm::cos(glm::radians(17.5)));
+        // lightShader.setFloat("pointLights[0].constant", 1.0f);
+        lightShader.setVec3("dirLight.direction", glm::vec3(-0.2f, -1.0f, -0.3f));
+        lightShader.setVec3("dirLight.ambient", glm::vec3(0.2f, 0.2f, 0.2f));
+        lightShader.setVec3("dirLight.diffuse", glm::vec3(0.5f, 0.5f, 0.5f));
+        lightShader.setVec3("dirLight.specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
 
         //light 
         glm::mat4 modelCube = glm::mat4(1.0f);
@@ -337,6 +350,20 @@ int main() {
 
         lightShader.use();
 
+        for (int i = 0; i < 4; i++) {
+            std::string number = std::to_string(i);
+            lightShader.setVec3("pointLights[" + number + "].ambient",  glm::vec3(0.05f, 0.05f, 0.05f));
+            lightShader.setVec3("pointLights[" + number + "].diffuse",  glm::vec3(0.8f, 0.8f, 0.8f));
+            lightShader.setVec3("pointLights[" + number + "].specular", glm::vec3(1.0f, 1.0f, 1.0f));
+
+            // Optional: set position and attenuation
+            lightShader.setVec3("pointLights[" + number + "].position", pointLightPositions[i]);
+            lightShader.setFloat("pointLights[" + number + "].constant", 1.0f);
+            lightShader.setFloat("pointLights[" + number + "].linear", 0.09f);
+            lightShader.setFloat("pointLights[" + number + "].quadratic", 0.032f);
+        }
+
+
         unsigned int transformLoc = glGetUniformLocation(lightShader.ID, "model");
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -347,6 +374,7 @@ int main() {
         unsigned int projectionLoc = glGetUniformLocation(lightShader.ID, "projection");
         glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+        glBindVertexArray(lightVAO);
         for(unsigned int i = 0; i < 10; i++) {
             glm::mat4 model = glm::mat4(1.0f);
             model = glm::translate(model, cubePositions[i]);
@@ -369,7 +397,15 @@ int main() {
         glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projectionCube));
         
         glBindVertexArray(lightCubeVAO);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        for(unsigned int i = 0; i < 4; i++) {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, pointLightPositions[i]);
+            float angle = 20.0f * i;
+            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
+            lightSourceShader.setMat4("model", model);
+
+            glDrawArrays(GL_TRIANGLES, 0, 36);
+        }
 
         glfwSwapBuffers(window);
         glfwPollEvents();
